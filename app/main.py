@@ -10,14 +10,14 @@ def validate(
     req: ValidateRequest,
     x_api_key: str = Header(None, alias="x-api-key")
 ):
-    expected_key = os.getenv("API_KEY")
+    single_key = os.getenv("API_KEY")
+    keys_csv = os.getenv("VALID_KEYS", "")
 
-    if not expected_key or x_api_key != expected_key:
+    valid_keys = set(k.strip() for k in keys_csv.split(",") if k.strip())
+
+    is_valid = (x_api_key in valid_keys) or (single_key and x_api_key == single_key)
+
+    if not is_valid:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
-    result = validate_csv(
-        req.csv_base64,
-        req.schema,
-        req.options
-    )
-    return result
+    return validate_csv(req.csv_base64, req.schema, req.options)
