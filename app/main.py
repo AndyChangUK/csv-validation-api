@@ -8,7 +8,7 @@ app = FastAPI(title="CSV Validation API")
 @app.post("/validate", response_model=ValidateResponse)
 def validate(
     req: ValidateRequest,
-    x_api_key: str = Header(None)
+    x_api_key: str = Header(None, alias="x-api-key")
 ):
     expected_key = os.getenv("API_KEY")
 
